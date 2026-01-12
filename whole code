@@ -12,7 +12,7 @@ import random
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.title("Space Invaders")
-wn.bgpic("space_invaders_bqckground.gif")
+wn.bgpic("bgpic.gif")
 
 #Register the shapes
 turtle.register_shape("invader.gif")
@@ -81,7 +81,7 @@ while True:
              enemysety(y)
 
 
-##put it collision part indented here.
+##put in collision part indented here.
 #put in bullet, not indented.
 # Reset the enemy
  x = random.randint(-200, 200) #this is to start each enemy at a different spot
