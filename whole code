@@ -48,17 +48,9 @@ enemies = {}
 for i in range(num_enemies):
     enemies.append(turtle.Turtle())
 
-
-    enemy.color('red') 
-
-
-delay = raw_input("press enter to finish.")
-
-
-
-
 for enemy in enemies:
-    eneemy.shape('circle')
+    enemy.color('red') 
+    enemy.shape('circle')
     enemy.penup()
     enemy.speed(0)
     x = random.randint(-200, 200) #this is to start each enemy at a different spot
@@ -66,11 +58,6 @@ for enemy in enemies:
     enemy.setposition(x, y)
 
 enemyspeed = 2
-
-
-
-
-
 
 #Main game loop
 while True:
@@ -92,6 +79,7 @@ while True:
              y -= 40
              enemyspeed *= -1
              enemysety(y)
+
 
 ##put it collision part indented here.
 #put in bullet, not indented.
@@ -169,3 +157,6 @@ if(iscollision(player,enemy)):
      enemy.hideturtle()
      print("Game over")
      break
+
+
+delay = raw_input("press enter to finish.")
