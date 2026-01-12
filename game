@@ -1,0 +1,39 @@
+git clone https://github.com/your-username/pixel-jump.git
+cd pixel-jump
+
+python -m venv venv
+source venv/bin/activate      # macOS/Linux
+# venv\Scripts\activate       # Windows
+
+pip install -r requirements.txt
+
+python main.py
+
+https://trello.com/b/8X9xX9xX/pixel-jump-dev
+
+pixel-jump/
+├── README.md               
+├── .gitignore              
+├── requirements.txt        
+├── main.py                
+├── src/
+│   ├── player.py          
+│   ├── enemy.py          
+│   ├── platform.py       
+│   ├── game.py            
+│   └── utils.py            
+├── assets/
+│   ├── sprites/
+│   │   ├── player.png
+│   │   ├── enemy.png
+│   │   └── platform.png
+│   └── sounds/
+│       ├── jump.wav
+│       └── game_over.wav
+├── docs/
+│   ├── design.md         
+│   └── trello.md        
+└── branches.md      
+
+git log --oneline --graph
+
