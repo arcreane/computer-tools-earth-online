@@ -1,0 +1,14 @@
+
+#Sound (MacOSX / Linux Only)
+
+if bulletstate == "ready":
+    os.system("aplay laser.wav&")
+
+if isCollision(bullet, enemy):
+    os.system("aplay explosion.way&")
+
+
+if isCollision(player, enemy):
+    os.system("aplay explosion.way&")
+
+#(afplay for mac)
