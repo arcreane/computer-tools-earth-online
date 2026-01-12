@@ -12,19 +12,19 @@ import platform
 if platform.system()=="Windows":
    try:
        import winsound
-   except:
+   except: 
        print("Windows module not available")
 
 #Set up the screen 
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.title("Space Invaders")
-wn.bgpic("space_invaders_background.gif")
+wn.bgpic("C:\Users\SUDHEESH\OneDrive - ISEP\game project\bg.png")
 wn.tracer(0)
 
 #Register the shapes
-wn.register_shape("invader.gif")
-wn.register_shape("player.gif")
+wn.register_shape("C:\Users\SUDHEESH\OneDrive - ISEP\game project\inv.png")
+wn.register_shape("C:\Users\SUDHEESH\OneDrive - ISEP\game project\pla.png")
 
 #Draw border
 border_pen = turtle.Turtle()
@@ -145,7 +145,7 @@ wn.listen()
 wn.onkeypress(move_left,"Left")
 wn.onkeypress(move_right,"Right")
 wn.onkeypress(fire_bullet,"space")
-play_sound("bgm.mp3",119)
+play_sound("C:\Users\SUDHEESH\OneDrive - ISEP\game project\Cinematic-electronic-track.mp3",119)
 
 #main 
 while True:
