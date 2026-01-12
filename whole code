@@ -5,18 +5,24 @@ import turtle
 import os
 import math
 import random
+import platform
 #solarcube?
-
+if platform.system()=="Windows":
+   try:
+       import winsound
+   except:
+       print("Windows module not available")
 
 #Set up the screen 
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.title("Space Invaders")
-wn.bgpic("bgpic.gif")
+wn.bgpic("space_invaders_background.gif")
+wn.tracer(0)
 
 #Register the shapes
-turtle.register_shape("invader.gif")
-turtle.register_shape("player.gif")
+wn.register_shape("invader.gif")
+wn.register_shape("player.gif")
 
 #Draw border
 border_pen = turtle.Turtle()
@@ -30,6 +36,7 @@ for side in range(4):
     border_pen.fd(600)
     border_pen.lt(90)
 border_pen.hideturtle()
+score=0
 
 #Create the player turtle
 player = turtle.Turtle()
@@ -81,6 +88,7 @@ while True:
              enemysety(y)
 
 
+
 ##put in collision part indented here.
 #put in bullet, not indented.
 # Reset the enemy
@@ -128,10 +136,42 @@ def iscollision(t1,t2):
         return True
     else:
         return False
-turtle.listen()
-turtle.onkey(move_left,"Left")
-turtle.onkey(move_right,"Right")
-turtle.onkey(fire_bullet,"space")
+def play_sound(sound_file,time=0):
+   if platform.system()=="Windows":
+        winsound.PlaySound(sound_file,winsound.SND_ASYNC)
+   elif platform.system()=="Linux":
+        os.system("aplay -q {}&".format(sound_file))
+   else:
+        os.system("afplay {}&".format(sound_file))
+   if time>0:
+        turtle.ontimer(lambda: play_sound(sound_file,time), t=int(time*1000))
+     
+wn.listen()
+wn.onkeypress(move_left,"Left")
+wn.onkeypress(move_right,"Right")
+wn.onkeypress(fire_bullet,"space")
+play_sound("bgm.mp3",119)
+while True:
+  wn.update()
+  move_player()
+ for enemy in enemies # so all the enemies can move
+        #Move the enemy
+         x = enemy.xcor()
+         x += enemyspeed 
+         enemy.setx(x)
+ 
+         #Reverse the enemy and move down
+         if enemy.xcor() > 280:
+             y = enemy.ycor()
+             y -= 40
+             enemyspeed *= -1
+             enemysety(y)
+
+         if enemy.xcor() < -280:
+             y = enemy.ycor()
+             y -= 40
+             enemyspeed *= -1
+             enemysety(y)
 
 
 in the main fn add this
@@ -157,6 +197,7 @@ if(iscollision(player,enemy)):
      enemy.hideturtle()
      print("Game over")
      break
+
 
 
 delay = raw_input("press enter to finish.")
