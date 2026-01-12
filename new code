@@ -1,0 +1,161 @@
+import turtle
+import math
+import platform
+
+# ---------------- SCREEN ----------------
+wn = turtle.Screen()
+wn.bgcolor("black")
+wn.title("Space Invaders")
+wn.setup(width=650, height=650)  # Make sure window is large enough
+wn.tracer(0)
+
+# ---------------- BORDER ----------------
+border = turtle.Turtle()
+border.speed(0)
+border.color("white")
+border.penup()
+border.setposition(-300, -300)
+border.pendown()
+border.pensize(3)
+for _ in range(4):
+    border.forward(600)
+    border.left(90)
+border.hideturtle()
+
+# ---------------- SCORE ----------------
+score = 0
+score_pen = turtle.Turtle()
+score_pen.hideturtle()
+score_pen.color("white")
+score_pen.penup()
+score_pen.setposition(-290, 270)
+score_pen.write("Score: 0", align="left", font=("Arial", 14, "normal"))
+
+# ---------------- PLAYER ----------------
+player = turtle.Turtle()
+player.shape("triangle")
+player.color("blue")
+player.penup()
+player.setposition(0, -250)
+player.speed(0)
+player.dx = 0
+player.shapesize(stretch_wid=1, stretch_len=1)  # visible size
+
+# ---------------- ENEMIES ----------------
+enemies = []
+enemy_speed = 0.4
+
+for i in range(30):
+    enemy = turtle.Turtle()
+    enemy.shape("circle")
+    enemy.color("red")
+    enemy.penup()
+    enemy.speed(0)
+    x = -225 + (i % 10) * 50
+    y = 250 - (i // 10) * 50
+    enemy.setposition(x, y)
+    enemy.shapesize(stretch_wid=0.7, stretch_len=0.7)  # visible enemy
+    enemies.append(enemy)
+
+# ---------------- BULLET ----------------
+bullet = turtle.Turtle()
+bullet.shape("triangle")
+bullet.color("yellow")
+bullet.penup()
+bullet.speed(0)
+bullet.setheading(90)
+bullet.shapesize(0.4, 0.8)  # proportional bullet
+bullet.hideturtle()
+bullet.dy = 20
+bullet_state = "ready"
+
+# ---------------- FUNCTIONS ----------------
+def move_left():
+    player.dx = -4
+
+def move_right():
+    player.dx = 4
+
+def stop_move():
+    player.dx = 0
+
+def fire_bullet():
+    global bullet_state
+    if bullet_state == "ready":
+        bullet_state = "fire"
+        bullet.setposition(player.xcor(), player.ycor() + 10)
+        bullet.showturtle()
+
+def is_collision(t1, t2):
+    return math.sqrt((t1.xcor() - t2.xcor())**2 +
+                     (t1.ycor() - t2.ycor())**2) < 20
+
+# ---------------- KEYBOARD ----------------
+wn.listen()
+wn.onkeypress(move_left, "Left")
+wn.onkeypress(move_right, "Right")
+wn.onkeyrelease(stop_move, "Left")
+wn.onkeyrelease(stop_move, "Right")
+wn.onkeypress(fire_bullet, "space")
+
+# ---------------- GAME LOOP ----------------
+game_over = False
+
+def game_loop():
+    global enemy_speed, bullet_state, score, game_over
+
+    if game_over:
+        return
+
+    try:
+        # Player movement
+        x = player.xcor() + player.dx
+        x = max(-280, min(280, x))
+        player.setx(x)
+
+        # Enemy movement
+        for enemy in enemies:
+            enemy.setx(enemy.xcor() + enemy_speed)
+
+            if enemy.xcor() > 280 or enemy.xcor() < -280:
+                enemy_speed *= -1
+                for e in enemies:
+                    e.sety(e.ycor() - 40)
+                break
+
+            # Bullet hits enemy
+            if bullet_state == "fire" and is_collision(bullet, enemy):
+                bullet.hideturtle()
+                bullet_state = "ready"
+                bullet.setposition(0, -400)
+                enemy.setposition(0, 10000)
+
+                score += 10
+                score_pen.clear()
+                score_pen.write(f"Score: {score}", align="left", font=("Arial", 14, "normal"))
+
+            # Enemy hits player
+            if is_collision(player, enemy):
+                player.hideturtle()
+                enemy.hideturtle()
+                print("GAME OVER")
+                game_over = True
+                return
+
+        # Bullet movement
+        if bullet_state == "fire":
+            bullet.sety(bullet.ycor() + bullet.dy)
+            if bullet.ycor() > 275:
+                bullet.hideturtle()
+                bullet_state = "ready"
+
+        wn.update()
+        wn.ontimer(game_loop, 16)  # ~60 FPS
+
+    except turtle.Terminator:
+        # window closed, exit safely
+        return
+
+# ---------------- START ----------------
+game_loop()
+wn.mainloop()
