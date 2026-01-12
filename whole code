@@ -1,4 +1,4 @@
-Space Invaders -- Part 1
+#Space Invaders -- Part 1
 #Set up the screen
 #Python 2.7 on Windows
 import turtle
@@ -62,7 +62,7 @@ player.speed=0
 #Choose a number of enemies.
 num_of_enemies = 30
 enemies = []
-for i in range(num_enemies):
+for i in range(num_of_enemies):
     enemies.append(turtle.Turtle())
 enemy_start_x=-225
 enemy_start_y=250
@@ -70,7 +70,7 @@ enemy_number=0
 
 for enemy in enemies:
     enemy.color('red') 
-    enemy.shape('circle')
+    enemy.shape('invader.gif')
     enemy.penup()
     enemy.speed(0)
     x = enemy_start_x + (50*enemy_number)
@@ -179,12 +179,14 @@ while True:
           bulletstate="ready"
 
        if(iscollision(bullet,enemy):
+           os.system("afplay explosion.wav&")
            #reset the bullet
            bullet.hideturtle()
            bulletstate="ready"
            bullet.setposition(0,-400)
-   #reset the enemy
-     enemy.setposition(-200,250)
+           #reset the enemy
+           enemy.setposition(0,10000)
+           
 if(iscollision(player,enemy)):
      player.hideturtle()
      enemy.hideturtle()
