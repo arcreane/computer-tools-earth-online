@@ -5,6 +5,8 @@ import turtle
 import os
 import math
 import random
+#solarcube?
+
 
 #Set up the screen 
 wn = turtle.Screen()
@@ -39,8 +41,63 @@ player.setposition(0, -250)
 player.setheading(90)
     
 
+#Create enemy
+#Choose a number of enemies.
+num_enemies = 5
+enemies = {}
+for i in range(num_enemies):
+    enemies.append(turtle.Turtle())
 
 
+    enemy.color('red') 
 
 
 delay = raw_input("press enter to finish.")
+
+
+
+
+for enemy in enemies:
+    eneemy.shape('circle')
+    enemy.penup()
+    enemy.speed(0)
+    x = random.randint(-200, 200) #this is to start each enemy at a different spot
+    y = random.randint(100, 250)
+    enemy.setposition(x, y)
+
+enemyspeed = 2
+
+
+
+
+
+
+#Main game loop
+while True:
+    for enemy in enemies # so all the enemies can move
+        #Move the enemy
+         x = enemy.xcor()
+         x += enemyspeed 
+         enemy.setx(x)
+ 
+         #Reverse the enemy and move down
+         if enemy.xcor() > 280:
+             y = enemy.ycor()
+             y -= 40
+             enemyspeed *= -1
+             enemysety(y)
+
+         if enemy.xcor() < -280:
+             y = enemy.ycor()
+             y -= 40
+             enemyspeed *= -1
+             enemysety(y)
+
+##put it collision part indented here.
+#put in bullet, not indented.
+# Reset the enemy
+ x = random.randint(-200, 200) #this is to start each enemy at a different spot
+ y = random.randint(100, 250)
+    enemy.setposition(x, y)
+
+
