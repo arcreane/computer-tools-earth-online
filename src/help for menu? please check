@@ -1,0 +1,127 @@
+import turtle
+
+# ------------------------------
+# Base Screen Class
+# ------------------------------
+class BaseScreen:
+    def __init__(self):
+        self.screen = turtle.Screen()
+        self.screen.setup(600, 600)
+        self.screen.title("Game Menu Example")
+        self.elements = []  # turtles to clear later
+
+    def clear(self):
+        for element in self.elements:
+            element.hideturtle()
+            element.clear()
+        self.elements = []
+
+    def add_element(self, t):
+        self.elements.append(t)
+
+# ------------------------------
+# Button Class
+# ------------------------------
+class Button(turtle.Turtle):
+    def __init__(self, text, x, y, callback):
+        super().__init__(visible=False)
+        self.penup()
+        self.goto(x, y)
+        self.callback = callback
+        self.text = text
+        self.draw_button()
+        self.showturtle()
+
+    def draw_button(self):
+        self.shape("square")
+        self.shapesize(stretch_wid=2, stretch_len=8)
+        self.color("lightblue")
+        self.write(self.text, align="center", font=("Arial", 16, "bold"))
+
+    def is_clicked(self, x, y):
+        bx, by = self.xcor(), self.ycor()
+        return (bx - 80 < x < bx + 80) and (by - 20 < y < by + 20)
+
+# ------------------------------
+# Menu Screen
+# ------------------------------
+class MenuScreen(BaseScreen):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.draw()
+
+    def draw(self):
+        title = turtle.Turtle(visible=False)
+        title.penup()
+        title.goto(0, 200)
+        title.write("MAIN MENU", align="center", font=("Arial", 28, "bold"))
+        self.add_element(title)
+
+        self.start_button = Button("START GAME", 0, 50, self.app.show_game)
+        self.menu_button = Button("QUIT", 0, -50, self.app.quit)
+
+        self.add_element(self.start_button)
+        self.add_element(self.menu_button)
+
+        self.screen.onclick(self.handle_click)
+
+    def handle_click(self, x, y):
+        if self.start_button.is_clicked(x, y):
+            self.app.show_game()
+        elif self.menu_button.is_clicked(x, y):
+            self.app.quit()
+
+# ------------------------------
+# Game Screen
+# ------------------------------
+class GameScreen(BaseScreen):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.draw()
+
+    def draw(self):
+        msg = turtle.Turtle(visible=False)
+        msg.penup()
+        msg.goto(0, 100)
+        msg.write("GAME SCREEN", align="center", font=("Arial", 28, "bold"))
+        self.add_element(msg)
+
+        self.back_button = Button("BACK TO MENU", 0, -200, self.app.show_menu)
+        self.add_element(self.back_button)
+
+        self.screen.onclick(self.handle_click)
+
+    def handle_click(self, x, y):
+        if self.back_button.is_clicked(x, y):
+            self.app.show_menu()
+
+# ------------------------------
+# App Controller
+# ------------------------------
+class App:
+    def __init__(self):
+        self.current_screen = None
+        self.show_menu()
+
+    def show_menu(self):
+        self._switch(MenuScreen(self))
+
+    def show_game(self):
+        self._switch(GameScreen(self))
+
+    def quit(self):
+        turtle.bye()
+
+    def _switch(self, new_screen):
+        if self.current_screen:
+            self.current_screen.clear()
+        self.current_screen = new_screen
+
+# ------------------------------
+# Run the App
+# ------------------------------
+App()
+turtle.mainloop()
+
