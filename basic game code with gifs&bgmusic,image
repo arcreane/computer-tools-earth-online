@@ -5,7 +5,6 @@ import os
 
 # ---------------- INIT SOUND ----------------
 pygame.mixer.init()
-
 bg_music = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\Cinematic-electronic-track.mp3"
 if os.path.exists(bg_music):
     pygame.mixer.music.load(bg_music)
@@ -13,17 +12,23 @@ if os.path.exists(bg_music):
 else:
     print("BG music not found")
 
+
+
+
+
 # ---------------- SCREEN ----------------
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.title("Space Invaders")
 wn.setup(650, 650)
 wn.tracer(0)
+bg_img = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\bggif.gif"
+wn.register_shape(bg_img)
+wn.bgpic(bg_img)
 
 # ---------------- REGISTER IMAGES ----------------
 player_img = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\playergif.gif"
 enemy_img  = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\invadergif.gif"
-
 wn.register_shape(player_img)
 wn.register_shape(enemy_img)
 
@@ -69,7 +74,7 @@ for i in range(30):
     enemy.speed(0)
     x = -225 + (i % 10) * 50
     y = 250 - (i // 10) * 50
-    enemy.goto(x, y)  
+    enemy.goto(x, y)
     enemies.append(enemy)
 
 # ---------------- BULLET ----------------
