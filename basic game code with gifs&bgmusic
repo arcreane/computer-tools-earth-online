@@ -1,0 +1,162 @@
+import turtle
+import math
+import pygame
+import os
+
+# ---------------- INIT SOUND ----------------
+pygame.mixer.init()
+
+bg_music = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\Cinematic-electronic-track.mp3"
+if os.path.exists(bg_music):
+    pygame.mixer.music.load(bg_music)
+    pygame.mixer.music.play(-1)
+else:
+    print("BG music not found")
+
+# ---------------- SCREEN ----------------
+wn = turtle.Screen()
+wn.bgcolor("black")
+wn.title("Space Invaders")
+wn.setup(650, 650)
+wn.tracer(0)
+
+# ---------------- REGISTER IMAGES ----------------
+player_img = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\playergif.gif"
+enemy_img  = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project\invadergif.gif"
+
+wn.register_shape(player_img)
+wn.register_shape(enemy_img)
+
+# ---------------- BORDER ----------------
+border = turtle.Turtle()
+border.hideturtle()
+border.speed(0)
+border.color("white")
+border.penup()
+border.goto(-300, -300)
+border.pendown()
+border.pensize(3)
+for _ in range(4):
+    border.forward(600)
+    border.left(90)
+
+# ---------------- SCORE ----------------
+score = 0
+score_pen = turtle.Turtle()
+score_pen.hideturtle()
+score_pen.color("white")
+score_pen.penup()
+score_pen.goto(-290, 270)
+score_pen.write("Score: 0", font=("Arial", 14, "normal"))
+
+# ---------------- PLAYER ----------------
+player = turtle.Turtle()
+player.shape(player_img)
+player.penup()
+player.speed(0)
+player.goto(0, -250)
+player.dx = 0
+
+
+# ---------------- ENEMIES ----------------
+enemies = []
+enemy_speed = 0.5
+
+for i in range(30):
+    enemy = turtle.Turtle()
+    enemy.shape(enemy_img)
+    enemy.penup()
+    enemy.speed(0)
+    x = -225 + (i % 10) * 50
+    y = 250 - (i // 10) * 50
+    enemy.goto(x, y)  
+    enemies.append(enemy)
+
+# ---------------- BULLET ----------------
+bullet = turtle.Turtle()
+bullet.shape("circle")
+bullet.color("red")
+bullet.penup()
+bullet.speed(2)
+bullet.setheading(90)
+bullet.shapesize(0.3, 0.7)
+bullet.hideturtle()
+bullet.dy = 20
+bullet_state = "ready"
+
+# ---------------- FUNCTIONS ----------------
+def move_left():
+    player.dx = -5
+
+def move_right():
+    player.dx = 5
+
+def stop():
+    player.dx = 0
+
+def fire_bullet():
+    global bullet_state
+    if bullet_state == "ready":
+        bullet_state = "fire"
+        bullet.goto(player.xcor(), player.ycor() + 15)
+        bullet.showturtle()
+
+def collision(a, b):
+    return math.hypot(a.xcor() - b.xcor(), a.ycor() - b.ycor()) < 25
+
+# ---------------- KEYS ----------------
+wn.listen()
+wn.onkeypress(move_left, "Left")
+wn.onkeypress(move_right, "Right")
+wn.onkeyrelease(stop, "Left")
+wn.onkeyrelease(stop, "Right")
+wn.onkeypress(fire_bullet, "space")
+
+# ---------------- GAME LOOP ----------------
+def game_loop():
+    global enemy_speed, bullet_state, score
+
+    # Player movement
+    x = player.xcor() + player.dx
+    x = max(-280, min(280, x))
+    player.setx(x)
+
+    # Enemy movement
+    for enemy in enemies:
+        enemy.setx(enemy.xcor() + enemy_speed)
+
+        if enemy.xcor() > 280 or enemy.xcor() < -280:
+            enemy_speed *= -1
+            for e in enemies:
+                e.sety(e.ycor() - 40)
+            break
+
+        if bullet_state == "fire" and collision(bullet, enemy):
+            bullet.hideturtle()
+            bullet_state = "ready"
+            bullet.goto(0, -400)
+            enemy.goto(0, 10000)
+
+            score += 10
+            score_pen.clear()
+            score_pen.write(f"Score: {score}", font=("Arial", 14, "normal"))
+
+        if collision(player, enemy):
+            player.hideturtle()
+            enemy.hideturtle()
+            print("GAME OVER")
+            return
+
+    # Bullet movement
+    if bullet_state == "fire":
+        bullet.sety(bullet.ycor() + bullet.dy)
+        if bullet.ycor() > 280:
+            bullet.hideturtle()
+            bullet_state = "ready"
+
+    wn.update()
+    wn.ontimer(game_loop, 16)
+
+# ---------------- START ----------------
+game_loop()
+wn.mainloop()
