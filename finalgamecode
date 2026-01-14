@@ -1,0 +1,267 @@
+import turtle
+import math
+import pygame
+
+# ================= PATHS =================
+BASE = r"C:\Users\SUDHEESH\OneDrive - ISEP\game project"
+
+PLAYER_IMG = {
+    "Easy": BASE + r"\easyplygif.gif",
+    "Normal": BASE + r"\normalplygif.gif",
+    "Hard": BASE + r"\hardplygif.gif",
+}
+
+ENEMY_IMG = {
+    "Easy": BASE + r"\easyinvgif.gif",
+    "Normal": BASE + r"\normalinvgif.gif",
+    "Hard": BASE + r"\hardinvgif.gif",
+}
+
+MENU_BG = BASE + r"\menubggif.gif"
+GAME_BG = BASE + r"\bggif.gif"
+GAMEOVER_BG = BASE + r"\gameoverbggif.gif"
+VICTORY_BG = BASE + r"\victorygif.gif"
+
+MUSIC = BASE + r"\Cinematic-electronic-track.mp3"
+LASER_SOUND = BASE + r"\laser.wav"
+
+# ================= SOUND =================
+pygame.mixer.init()
+pygame.mixer.music.load(MUSIC)
+pygame.mixer.music.play(-1)
+laser_sfx = pygame.mixer.Sound(LASER_SOUND)
+
+# ================= SCREEN =================
+wn = turtle.Screen()
+wn.setup(650, 650)
+wn.title("Space Warriors")
+wn.tracer(0)
+
+# ================= REGISTER SHAPES =================
+for img in PLAYER_IMG.values():
+    wn.register_shape(img)
+for img in ENEMY_IMG.values():
+    wn.register_shape(img)
+for img in [MENU_BG, GAME_BG, GAMEOVER_BG, VICTORY_BG]:
+    wn.register_shape(img)
+
+# ================= STATES =================
+MENU, GAME, GAMEOVER, VICTORY, PAUSE = "menu", "game", "gameover", "victory", "pause"
+state = MENU
+difficulty = "Easy"
+
+enemy_speed_map = {"Easy": 0.8, "Normal": 1.2, "Hard": 1.8}
+enemy_count_map = {"Easy": 15, "Normal": 20, "Hard": 50}
+bullet_count_map = {"Easy": 1, "Normal": 2, "Hard": 3}
+
+# ================= HUD =================
+hud = turtle.Turtle()
+hud.hideturtle()
+hud.color("black")
+hud.penup()
+
+menu_pen = turtle.Turtle()
+menu_pen.hideturtle()
+menu_pen.color("white")
+menu_pen.penup()
+
+# ================= PLAYER =================
+player = turtle.Turtle()
+player.penup()
+player.dx = 0
+
+# ================= BULLETS =================
+bullets = []
+BULLET_SPEED = 20
+
+# ================= ENEMIES =================
+enemies = []
+enemy_speed = enemy_speed_map[difficulty]
+
+# ================= GAME VARS =================
+score = 0
+lives = 3
+
+# ================= COLLISION =================
+def hit(a, b):
+    return math.hypot(a.xcor() - b.xcor(), a.ycor() - b.ycor()) < 25
+
+# ================= MENU =================
+def show_menu():
+    global state
+    state = MENU
+    wn.bgpic(MENU_BG)
+    menu_pen.clear()
+    menu_pen.goto(0, 80)
+    menu_pen.write("SPACE INVADERS", align="center", font=("Impact", 38, "bold"))
+    menu_pen.goto(0, 10)
+    menu_pen.write("1 - PLAY", align="center", font=("Arial Black", 18))
+    menu_pen.goto(0, -30)
+    menu_pen.write("2 - MODE", align="center", font=("Arial Black", 18))
+    menu_pen.goto(0, -70)
+    menu_pen.write("3 - EXIT", align="center", font=("Arial Black", 18))
+    menu_pen.goto(0, -130)
+    menu_pen.write(f"Difficulty: {difficulty}", align="center", font=("Arial Black", 14))
+
+# ================= START GAME =================
+def start_game():
+    global state, score, lives, enemies, bullets, enemy_speed
+    state = GAME
+    wn.bgpic(GAME_BG)
+    menu_pen.clear()
+    hud.clear()
+
+    score = 0
+    lives = 3
+    enemy_speed = enemy_speed_map[difficulty]
+
+    bullets.clear()
+    for e in enemies:
+        e.hideturtle()
+    enemies.clear()
+
+    player.shape(PLAYER_IMG[difficulty])
+    player.goto(0, -260)
+    player.showturtle()
+    player.dx = 0
+
+    for i in range(enemy_count_map[difficulty]):
+        e = turtle.Turtle()
+        e.shape(ENEMY_IMG[difficulty])
+        e.penup()
+        x = -250 + (i % 10) * 55
+        y = 220 - (i // 10) * 55
+        e.goto(x, y)
+        enemies.append(e)
+
+# ================= GAME OVER =================
+def show_gameover():
+    global state
+    state = GAMEOVER
+    wn.bgpic(GAMEOVER_BG)
+    menu_pen.clear()
+    menu_pen.goto(0, 0)
+    menu_pen.write("GAME OVER\nPress 1 to Replay",
+                   align="center",
+                   font=("Impact", 30, "bold"))
+
+# ================= VICTORY =================
+def show_victory():
+    global state
+    state = VICTORY
+    wn.bgpic(VICTORY_BG)
+    menu_pen.clear()
+    menu_pen.goto(0, 0)
+    menu_pen.write("YOU WON!\nPress 1 to Replay",
+                   align="center",
+                   font=("Impact", 30, "bold"))
+
+# ================= HUD =================
+def draw_hud():
+    hud.clear()
+    hud.goto(-310, 300)
+    hud.write(f"Score: {score}   Lives: {lives}   Mode: {difficulty}",
+              font=("Arial Black", 14))
+
+# ================= CONTROLS =================
+def left():
+    if state == GAME: player.dx = -6
+
+def right():
+    if state == GAME: player.dx = 6
+
+def stop():
+    player.dx = 0
+
+def fire():
+    if state != GAME:
+        return
+    laser_sfx.play()
+    count = bullet_count_map[difficulty]
+    for i in range(count):
+        b = turtle.Turtle()
+        b.shape("triangle")
+        b.color("red")
+        b.penup()
+        offset = (i - (count - 1)/2) * 12
+        b.goto(player.xcor() + offset, player.ycor() + 15)
+        bullets.append(b)
+
+def toggle_pause():
+    global state
+    if state == GAME:
+        state = PAUSE
+    elif state == PAUSE:
+        state = GAME
+
+def menu_keys(k):
+    global difficulty
+    if k == "1":
+        start_game()
+    elif k == "2":
+        difficulty = {"Easy": "Normal", "Normal": "Hard", "Hard": "Easy"}[difficulty]
+        show_menu()
+    elif k == "3":
+        wn.bye()
+
+
+# ================= KEYS =================
+wn.listen()
+wn.onkeypress(left, "Left")
+wn.onkeypress(right, "Right")
+wn.onkeyrelease(stop, "Left")
+wn.onkeyrelease(stop, "Right")
+wn.onkeypress(fire, "space")
+wn.onkeypress(toggle_pause, "p")
+wn.onkeypress(lambda: menu_keys("1"), "1")
+wn.onkeypress(lambda: menu_keys("2"), "2")
+wn.onkeypress(lambda: menu_keys("3"), "3")
+
+# ================= LOOP =================
+def loop():
+    global lives, score, enemy_speed
+
+    if state == GAME:
+        player.setx(max(-280, min(280, player.xcor() + player.dx)))
+
+        for e in enemies[:]:
+            e.setx(e.xcor() + enemy_speed)
+            if e.xcor() > 280 or e.xcor() < -280:
+                enemy_speed *= -1
+                for en in enemies:
+                    en.sety(en.ycor() - 35)
+                break
+
+            if hit(player, e):
+                lives -= 1
+                e.hideturtle()
+                enemies.remove(e)
+                if lives <= 0:
+                    show_gameover()
+
+        for b in bullets[:]:
+            b.sety(b.ycor() + BULLET_SPEED)
+            if b.ycor() > 320:
+                b.hideturtle()
+                bullets.remove(b)
+            for e in enemies[:]:
+                if hit(b, e):
+                    b.hideturtle()
+                    bullets.remove(b)
+                    e.hideturtle()
+                    enemies.remove(e)
+                    score += 10
+                    break
+
+        if not enemies:
+            show_victory()
+
+        draw_hud()
+
+    wn.update()
+    wn.ontimer(loop, 16)
+
+# ================= START =================
+show_menu()
+loop()
+wn.mainloop()
